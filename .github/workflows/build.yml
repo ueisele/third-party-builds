@@ -27,9 +27,9 @@ jobs:
       id: gcp-maven
       run: |
         echo "::set-output name=maven_url::$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)"
-        echo "::set-output name=maven_password::$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')"
-    - name: Mask secrets
-      run:  echo "::add-mask::${{ steps.gcp-maven.outputs.maven_password }}"
+        MAVEN_PASSWORD=$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')"
+        echo "::set-output name=maven_password::${MAVEN_PASSWORD}"
+        echo "::add-mask::${MAVEN_PASSWORD}"
     - name: Build  
       run: ./build.sh
       env:
