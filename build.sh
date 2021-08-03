@@ -59,9 +59,9 @@ function publish_kafka () {
 function build_and_publish () {
     for kafka_git_branch in "${KAFKA_GIT_BRANCHES[@]}"; do
         local kafka_git_refspec=$(git ls-remote --heads ${KAFKA_GIT_REPO} refs/heads/${kafka_git_branch} | awk '{ print $1}')
-        #cleanup_kafka_build ${kafka_git_refspec}
-        #clone_kafka ${kafka_git_refspec}
-        #build_kafka ${kafka_git_refspec}
+        cleanup_kafka_build ${kafka_git_refspec}
+        clone_kafka ${kafka_git_refspec}
+        build_kafka ${kafka_git_refspec}
         if [ "${SHOULD_PUBLISH}" == "true" ]; then
             publish_kafka ${kafka_git_refspec}
         fi
