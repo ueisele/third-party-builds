@@ -1,0 +1,21 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'zulu'
+        java-version: '11'
+    - run: ./build.sh
+      env:
+        MAVEN_USERNAME: ${{ secret.MAVEN_USERNAME }}
+        MAVEN_PASSWORD: ${{ secret.MAVEN_PASSWORD }}
+        SHOULD_DEPLOY: ${{ secret.SHOULD_DEPLOY }}
