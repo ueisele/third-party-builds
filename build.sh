@@ -6,8 +6,6 @@ BUILD_DIR=${SCRIPT_DIR}/build
 KAFKA_GIT_REPO=${KAFKA_GIT_REPO:-https://github.com/apache/kafka.git}
 KAFKA_GIT_BRANCHES=(3.0)
 
-MAVEN_URL=${MAVEN_URL:-https://maven.pkg.github.com/ueisele/kafka-builds}
-
 function usage () {
     echo "$0: $1" >&2
     echo
@@ -81,6 +79,10 @@ function parseCmd () {
                 ;;
         esac
     done
+    if [ -z "${MAVEN_URL}" ] && [ "${SHOULD_PUBLISH}" == "true" ]; then
+        usage "Missing env var MAVEN_URL: $1"
+        return $?
+    fi
     if [ -z "${MAVEN_USERNAME}" ] && [ "${SHOULD_PUBLISH}" == "true" ]; then
         usage "Missing env var MAVEN_USERNAME: $1"
         return $?

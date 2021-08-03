@@ -3,6 +3,8 @@ name: Build
 on:
   push:
     branches: [ main ]
+#  schedule:
+#  - cron:  '*/15 * * * *'
 
 jobs:
 
@@ -16,6 +18,7 @@ jobs:
         java-version: '11'
     - run: ./build.sh
       env:
+        MAVEN_URL: ${{ secrets.MAVEN_URL }}
         MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
         SHOULD_PUBLISH: ${{ secrets.SHOULD_PUBLISH }}
