@@ -16,6 +16,6 @@ jobs:
         java-version: '11'
     - run: ./build.sh
       env:
-        MAVEN_USERNAME: ${{ secret.MAVEN_USERNAME }}
-        MAVEN_PASSWORD: ${{ secret.MAVEN_PASSWORD }}
-        SHOULD_DEPLOY: ${{ secret.SHOULD_DEPLOY }}
+        MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+        SHOULD_DEPLOY: ${{ secrets.SHOULD_DEPLOY }}
