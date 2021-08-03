@@ -23,16 +23,16 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
-    - name: Get Maven Url
+    - name: Get Maven Url and Credentials
+      id: gcp-maven
       run: |
-        echo "MAVEN_URL=$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)" >> $GITHUB_ENV
-    - name: Get Maven Password
-      run: |
-        echo "::add-mask:: MAVEN_PASSWORD=$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')" >> $GITHUB_ENV
+        echo "::set-output name=maven_url::$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)"
+        echo "::set-output name=maven_password::$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')"
+        echo "::add-mask::${{ steps.gcp-maven.outputs.maven_password }}"
     - name: Build  
       run: ./build.sh
       env:
-        MAVEN_URL: ${{ env.MAVEN_URL }}
+        MAVEN_URL: ${{ steps.gcp-maven.outputs.maven_url }}
         MAVEN_USERNAME: _json_key_base64
-        MAVEN_PASSWORD: ${{ env.MAVEN_PASSWORD }}
+        MAVEN_PASSWORD: ${{ steps.gcp-maven.outputs.maven_password }}
         SHOULD_PUBLISH: ${{ secrets.SHOULD_PUBLISH }}
