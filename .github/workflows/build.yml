@@ -17,20 +17,23 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: '11'
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-central-1
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
     - name: Get Maven Url
-      run: echo "MAVEN_URL=$(aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --query repositoryEndpoint --output text)" >> $GITHUB_ENV
+      run: |
+        echo "MAVEN_URL=$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)" >> $GITHUB_ENV
     - name: Get Maven Password
-      run: echo "MAVEN_PASSWORD=$(aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text)" >> $GITHUB_ENV
+      run: |
+        echo "MAVEN_PASSWORD=$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/'" >> $GITHUB_ENV
+        echo ::add-mask::${MAVEN_PASSWORD}
     - name: Build  
       run: ./build.sh
       env:
         MAVEN_URL: ${{ env.MAVEN_URL }}
-        MAVEN_USERNAME: aws
+        MAVEN_USERNAME: _json_key_base64
         MAVEN_PASSWORD: ${{ env.MAVEN_PASSWORD }}
         SHOULD_PUBLISH: ${{ secrets.SHOULD_PUBLISH }}
