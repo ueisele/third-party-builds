@@ -28,7 +28,7 @@ jobs:
         echo "MAVEN_URL=$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)" >> $GITHUB_ENV
     - name: Get Maven Password
       run: |
-        echo "MAVEN_PASSWORD=$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/'" >> $GITHUB_ENV
+        echo "MAVEN_PASSWORD=$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')" >> $GITHUB_ENV
         echo ::add-mask::${MAVEN_PASSWORD}
     - name: Build  
       run: ./build.sh
