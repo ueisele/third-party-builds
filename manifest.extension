@@ -1,0 +1,10 @@
+
+for (Project project : subprojects) {
+  project.jar.manifest {
+    attributes(
+      'Version': "${version}",
+      'GitRepo': "${gitRepo}",
+      'GitCommitSha': "${gitCommitSha}"
+    )
+  }
+}

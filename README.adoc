@@ -1,1 +1,32 @@
 = Kafka Builds
+
+This repository is used to build and publish _SNAPSHOT_ and _RC_ versions of link:https://github.com/apache/kafka.git[Apache Kafka] once a day.
+
+At the moment versions for Apache Kafka _3.0_ and _3.1_ are build and published.
+
+The artifacts are published to a _Google Arifact Repository_ and can be fetched via https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/kafka-snapshots.
+
+.Add the following snippet to your `gradle.build` file
+[source,java]
+----
+repositories {
+    maven { url 'https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/kafka-snapshots' }
+}
+----
+
+.Add the following snippet to yout `pom.xml` file
+[source,xml]
+----
+  <repositories>
+    <repository>
+      <id>kafka-snapshots</id>
+      <url>https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/kafka-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+----

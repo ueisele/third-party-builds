@@ -25,7 +25,7 @@ function build_image () {
 
 function run_in_image () {
     docker run --rm \
-        -v "${SCRIPT_DIR}:/home/appuser/workspace" \
+        -v "${SCRIPT_DIR}/..:/home/appuser/workspace" \
         --env MAVEN_URL=${MAVEN_URL} \
         --env MAVEN_USERNAME=${MAVEN_USERNAME} \
         --env MAVEN_PASSWORD=${MAVEN_PASSWORD} \
