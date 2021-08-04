@@ -74,6 +74,7 @@ function publish_kafka () {
         cd "$(resolve_build_dir ${kafka_git_refspec})"
         ./gradlew publish \
             -Pversion=$(resolveKafkaVersion ${kafka_git_refspec}) \
+            -PgitRepo=${KAFKA_GIT_REPO} -PgitCommitSha=$(git rev-parse HEAD) \
             -PskipSigning=true -PmavenUrl=${MAVEN_URL} -PmavenUsername=${MAVEN_USERNAME} -PmavenPassword=${MAVEN_PASSWORD} \
             --profile --no-daemon
     )
