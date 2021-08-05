@@ -60,7 +60,7 @@ function build_kafka () {
     (
         cd "$(resolve_build_dir ${kafka_git_refspec})"
         cat ${SCRIPT_DIR}/manifest.extension >> build.gradle
-        ./gradlew jar \
+        ./gradlew jar srcJar javadocJar scaladocJar testJar testSrcJar \
             -Pversion=$(resolveKafkaVersion ${kafka_git_refspec}) \
             -PgitRepo=${KAFKA_GIT_REPO} -PgitCommitSha=$(git rev-parse HEAD) -PbuildTimestamp=$(date -Iseconds --utc) \
             --profile --no-daemon
