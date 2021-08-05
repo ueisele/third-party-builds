@@ -4,7 +4,8 @@ for (Project project : subprojects) {
     attributes(
       'Version': "${version}",
       'GitRepo': "${gitRepo}",
-      'GitCommitSha': "${gitCommitSha}"
+      'GitCommitSha': "${gitCommitSha}",
+      'BuildTimestamp': "${buildTimestamp}"
     )
   }
 }

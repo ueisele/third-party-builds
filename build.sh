@@ -62,7 +62,7 @@ function build_kafka () {
         cat ${SCRIPT_DIR}/manifest.extension >> build.gradle
         ./gradlew jar \
             -Pversion=$(resolveKafkaVersion ${kafka_git_refspec}) \
-            -PgitRepo=${KAFKA_GIT_REPO} -PgitCommitSha=$(git rev-parse HEAD) \
+            -PgitRepo=${KAFKA_GIT_REPO} -PgitCommitSha=$(git rev-parse HEAD) -PbuildTimestamp=$(date -Iseconds --utc) \
             --profile --no-daemon
     )
 }
@@ -74,7 +74,7 @@ function publish_kafka () {
         cd "$(resolve_build_dir ${kafka_git_refspec})"
         ./gradlew publish \
             -Pversion=$(resolveKafkaVersion ${kafka_git_refspec}) \
-            -PgitRepo=${KAFKA_GIT_REPO} -PgitCommitSha=$(git rev-parse HEAD) \
+            -PgitRepo=${KAFKA_GIT_REPO} -PgitCommitSha=$(git rev-parse HEAD) -PbuildTimestamp=$(date -Iseconds --utc) \
             -PskipSigning=true -PmavenUrl=${MAVEN_URL} -PmavenUsername=${MAVEN_USERNAME} -PmavenPassword=${MAVEN_PASSWORD} \
             --profile --no-daemon
     )
