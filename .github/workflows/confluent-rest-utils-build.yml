@@ -42,4 +42,5 @@ jobs:
       run: ./confluent/build-cp-rest-utils.sh
       env:
         MAVEN_REPO_ID: confluent-snapshots::default::${{ steps.gcp-maven.outputs.maven_url }}
+        MAVEN_URL: ${{ steps.gcp-maven.outputs.maven_url }}
         SHOULD_PUBLISH: ${{ secrets.SHOULD_PUBLISH }}
