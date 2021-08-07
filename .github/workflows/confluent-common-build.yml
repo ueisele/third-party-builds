@@ -32,7 +32,7 @@ jobs:
         echo "::add-mask::${maven_password}"
     - name: Create Maven Settings  
       run: |
-        mkdir -P ~/.m2
+        mkdir -p ~/.m2
         ./confluent/btpl.sh confluent/m2-settings.xml.btpl ~/.m2/settings.xml 
       env:
         MAVEN_URL: ${{ steps.gcp-maven.outputs.maven_url }}
