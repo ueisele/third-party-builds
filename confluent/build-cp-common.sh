@@ -19,14 +19,23 @@ function resolve_build_dir () {
     echo "${BUILD_DIR}/cp-common-${confluent_git_refspec//\//-}"
 }
 
-function resolve_confluent_version () {
+function resolve_confluent_main_version () {
     local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
         local maven_version="$(cat pom.xml | head -n50 | grep "<version>" | sed 's/.*>\([^<]*\)<.*/\1/')"
-        local short_version="$(echo ${maven_version} | sed 's/^\([0-9]\+\.[0-9]\+\.[0-9]\+\).*$/\1/')"
-        echo "${short_version}-SNAPSHOT"
+        echo ${maven_version} | sed 's/^\([0-9]\+\.[0-9]\+\.[0-9]\+\).*$/\1/'
     )
+}
+
+function resolve_confluent_version () {
+    local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
+    echo "$(resolve_confluent_main_version ${confluent_git_refspec})-SNAPSHOT"
+}
+
+function resolve_confluent_kafka_version () {
+    local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
+    echo "$(resolve_confluent_main_version ${confluent_git_refspec})-ccs-SNAPSHOT"
 }
 
 function cleanup_confluent_build () {
@@ -54,6 +63,7 @@ function build_confluent () {
     local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
     echo "Building Confluent ${confluent_git_refspec}"
     local version=$(resolve_confluent_version ${confluent_git_refspec})
+    local kafka_version=$(resolve_confluent_kafka_version ${confluent_git_refspec})
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
         if [ -d "assembly-plugin-boilerplate" ]; then
@@ -74,7 +84,7 @@ function build_confluent () {
         mvn versions:update-child-modules
         git apply ${SCRIPT_DIR}/cp-common.manifest.patch
         mvn install -Dinstalled.pom.file=pom.xml -Dio.confluent.common.version=${version} \
-            -Dkafka.version=${version} -Dconfluent.version.range=${version} \
+            -Dkafka.version=${kafka_version} -Dconfluent.version.range=${kafka_version} \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
@@ -83,11 +93,12 @@ function publish_confluent () {
     local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
     echo "Publishing Confluent ${confluent_git_refspec} to ${MAVEN_REPO_ID}"
     local version=$(resolve_confluent_version ${confluent_git_refspec})
+    local kafka_version=$(resolve_confluent_kafka_version ${confluent_git_refspec})
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
         mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -Dmaven.test.skip=true \
             -Dinstalled.pom.file=pom.xml -Dio.confluent.common.version=${version} \
-            -Dkafka.version=${version} -Dconfluent.version.range=${version} \
+            -Dkafka.version=${kafka_version} -Dconfluent.version.range=${kafka_version} \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
