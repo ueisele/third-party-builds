@@ -1,0 +1,50 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+<profiles>
+<profile>
+<id>default</id>
+<repositories>
+	<repository>
+		<id>confluent-snapshots</id>
+		<name>Confluent Snapshots</name>
+		<url>${MAVEN_URL}</url>
+		<releases>
+		    <enabled>false</enabled>
+		</releases>
+		<snapshots>
+		    <enabled>true</enabled>
+		</snapshots>
+	</repository>
+</repositories>
+</profile>
+</profiles>
+<activeProfiles>
+   <activeProfile>default</activeProfile>
+</activeProfiles>
+<servers>
+    <server>
+      <id>confluent-snapshots</id>
+      <configuration>
+        <httpConfiguration>
+          <get>
+            <usePreemptive>true</usePreemptive>
+          </get>
+          <head>
+            <usePreemptive>true</usePreemptive>
+          </head>
+          <put>
+            <params>
+              <property>
+                <name>http.protocol.expect-continue</name>
+                <value>false</value>
+              </property>
+            </params>
+          </put>
+        </httpConfiguration>
+      </configuration>
+      <username>${MAVEN_USERNAME}</username>
+      <password>${MAVEN_PASSWORD}</password>
+    </server>
+  </servers>
+</settings>

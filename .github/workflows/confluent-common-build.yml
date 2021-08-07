@@ -1,0 +1,45 @@
+name: Confluent Common Build
+
+on:
+  workflow_run:
+    workflows: ["Confluent Kafka Build"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup JDK
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'zulu'
+        java-version: '11'
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+    - name: Get Maven Url and Credentials
+      id: gcp-maven
+      run: |
+        echo "::set-output name=maven_url::$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO_CONFLUENT }} --location ${{ secrets.GCP_LOCATION }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)"
+        maven_password="$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO_CONFLUENT }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')"
+        echo "::set-output name=maven_password::${maven_password}"
+        echo "::add-mask::${maven_password}"
+    - name: Create Maven Settings  
+      run: |
+        mkdir -P ~/.m2
+        ./confluent/btpl.sh confluent/m2-settings.xml.btpl ~/.m2/settings.xml 
+      env:
+        MAVEN_URL: ${{ steps.gcp-maven.outputs.maven_url }}
+        MAVEN_USERNAME: _json_key_base64
+        MAVEN_PASSWORD: ${{ steps.gcp-maven.outputs.maven_password }}        
+    - name: Build  
+      run: ./confluent/build-cp-common.sh
+      env:
+        MAVEN_REPO_ID: confluent-snapshots::default::${{ steps.gcp-maven.outputs.maven_url }}
+        SHOULD_PUBLISH: ${{ secrets.SHOULD_PUBLISH }}
