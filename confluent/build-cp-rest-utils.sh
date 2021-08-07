@@ -9,7 +9,7 @@ CONFLUENT_GIT_REPO=${CONFLUENT_GIT_REPO:-https://github.com/confluentinc/rest-ut
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: MAVEN_REPO_ID=confluent-snapshots::default::\${MAVEN_URL} MAVEN_URL=http://... SHOULD_PUBLISH=true $0"
+    echo "Usage: MAVEN_REPO_ID=confluent-snapshots::default::\${MAVEN_URL} SHOULD_PUBLISH=true $0"
     echo
     return 1
 }
@@ -69,7 +69,7 @@ function build_confluent () {
         sed -i '0,/<version>/{s/<version>[^<]*<\/version>/<version>7.0.0-SNAPSHOT<\/version>/}' pom.xml
         mvn versions:set -DnewVersion=${version}
         mvn versions:update-child-modules
-        mvn install -Dmaven.test.skip=true -Dconfluent.maven.repo=${MAVEN_URL} \
+        mvn install -Dmaven.test.skip=true \
             -Dio.confluent.common.version=${version} -Dio.confluent.rest-utils.version=${version} \
             -Dkafka.version=${kafka_version} -Dconfluent.version.range=${kafka_version} \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)

@@ -10,13 +10,26 @@
 		<name>Confluent Snapshots</name>
 		<url>${MAVEN_URL}</url>
 		<releases>
-		    <enabled>false</enabled>
+		  <enabled>false</enabled>
 		</releases>
 		<snapshots>
-		    <enabled>true</enabled>
+		  <enabled>true</enabled>
 		</snapshots>
 	</repository>
 </repositories>
+<pluginRepositories>
+  <pluginRepository>
+    <id>confluent-snapshots</id>
+    <name>Confluent Snapshots</name>
+    <url>${MAVEN_URL}</url>
+    <releases>
+		  <enabled>false</enabled>
+    </releases>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+  </pluginRepository>
+</pluginRepositories>
 </profile>
 </profiles>
 <activeProfiles>
