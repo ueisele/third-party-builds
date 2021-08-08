@@ -8,7 +8,7 @@ KAFKA_GIT_REPO=${KAFKA_GIT_REPO:-https://github.com/apache/kafka.git}
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: BUILD=3.0 MAVEN_USERNAME=user MAVEN_PASSWORD=password SHOULD_PUBLISH=true $0"
+    echo "Usage: BUILD=3.0 MAVEN_URL=https://... MAVEN_USERNAME=user MAVEN_PASSWORD=password SHOULD_PUBLISH=true $0"
     echo
     return 1
 }
