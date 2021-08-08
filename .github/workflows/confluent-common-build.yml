@@ -50,13 +50,11 @@ jobs:
 
     - name: Cache Maven packages
       uses: actions/cache@v2
-      env:
-        cache-name: maven-${{ secrets.CACHE_VERSION }}
       with:
         path: ~/.m2/repository
-        key: ${{ env.cache-name }}
+        key: maven-confluent-common-${{ matrix.build }}
 
-    - name: Build and Publish ${{ matrix.build }}
+    - name: Build and Publish
       run: ./confluent/build-cp-common.sh
       env:
         BUILD: ${{ matrix.build }}
