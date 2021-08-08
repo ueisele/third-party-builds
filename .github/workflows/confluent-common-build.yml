@@ -58,5 +58,6 @@ jobs:
       run: ./confluent/build-cp-common.sh
       env:
         BUILD: ${{ matrix.build }}
+        MAVEN_URL: ${{ steps.gcp-maven.outputs.maven_url }}
         MAVEN_REPO_ID: confluent-snapshots::default::${{ steps.gcp-maven.outputs.maven_url }}
         SHOULD_PUBLISH: ${{ secrets.SHOULD_PUBLISH }}

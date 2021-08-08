@@ -74,6 +74,7 @@ function build_confluent () {
             replace_value_in_pom ${pom} io.confluent.kafka-rest.version ${version}
             replace_value_in_pom ${pom} io.confluent.ksql.version ${version}
         done
+        sed -i "s/http:\/\/packages.confluent.io\/maven\//${MAVEN_URL//\//\\\/}/" pom.xml
         # set project version
         mvn versions:set -DnewVersion=${version}
         mvn versions:update-child-modules

@@ -4,6 +4,7 @@ SCRIPT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 BUILD_DIR=${SCRIPT_DIR}/build
 
 CONFLUENT_GIT_REPO=${CONFLUENT_GIT_REPO:-https://github.com/confluentinc/common.git}
+MAVEN_URL=${MAVEN_URL:-https://packages.confluent.io/maven/}
 
 function usage () {
     echo "$0: $1" >&2
@@ -95,7 +96,7 @@ function build_confluent () {
         mvn versions:set -DnewVersion=${version}
         mvn versions:update-child-modules
         git apply ${SCRIPT_DIR}/cp-common.manifest.patch
-        mvn install --update-snapshots \
+        mvn install --update-snapshots -Dconfluent.maven.repo=${MAVEN_URL} \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
@@ -105,7 +106,7 @@ function publish_confluent () {
     echo "Publishing Confluent ${confluent_git_refspec} to ${MAVEN_REPO_ID}"
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
-        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -DskipTests=true \
+        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -Dconfluent.maven.repo=${MAVEN_URL} -DskipTests=true \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
