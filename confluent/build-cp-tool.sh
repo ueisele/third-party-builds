@@ -3,6 +3,8 @@ set -e
 SCRIPT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 BUILD_DIR=${SCRIPT_DIR}/build
 
+MAVEN_URL=${MAVEN_URL:-https://packages.confluent.io/maven/}
+
 function usage () {
     echo "$0: $1" >&2
     echo
@@ -74,12 +76,15 @@ function build_confluent () {
             replace_value_in_pom ${pom} io.confluent.kafka-rest.version ${version}
             replace_value_in_pom ${pom} io.confluent.ksql.version ${version}
         done
+        # replace confluent repository
         sed -i "s/http:\/\/packages.confluent.io\/maven\//${MAVEN_URL//\//\\\/}/" pom.xml
+        sed -i "s/https:\/\/packages.confluent.io\/maven\//${MAVEN_URL//\//\\\/}/" pom.xml
+        sed -i "s/\${confluent.maven.repo}/${MAVEN_URL//\//\\\/}/" pom.xml
         # set project version
         mvn versions:set -DnewVersion=${version}
         mvn versions:update-child-modules
         # install
-        mvn install --update-snapshots -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
+        mvn install  -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
