@@ -78,7 +78,7 @@ function build_confluent () {
         mvn versions:set -DnewVersion=${version}
         mvn versions:update-child-modules
         # install
-        mvn install -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
+        mvn install --update-snapshots -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }

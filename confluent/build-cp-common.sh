@@ -95,7 +95,7 @@ function build_confluent () {
         mvn versions:set -DnewVersion=${version}
         mvn versions:update-child-modules
         git apply ${SCRIPT_DIR}/cp-common.manifest.patch
-        mvn install \
+        mvn install --update-snapshots \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
