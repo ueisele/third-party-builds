@@ -73,5 +73,11 @@
       <url>https://repository.ow2.org/nexus/content/repositories/snapshots</url>
       <mirrorOf>ow2-snapshot</mirrorOf>
     </mirror>
+    <mirror>
+      <id>apache-snapshot-https</id>
+      <name>Https Apache Snapshot Repository</name>
+      <url>https://repository.apache.org/snapshots</url>
+      <mirrorOf>apache.snapshots</mirrorOf>
+    </mirror>
   </mirrors>
 </settings>

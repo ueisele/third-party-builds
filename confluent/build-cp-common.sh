@@ -75,14 +75,14 @@ function build_confluent () {
         cd "$(resolve_build_dir ${confluent_git_refspec})"
         if [ -d "assembly-plugin-boilerplate" ]; then
             cd assembly-plugin-boilerplate
-            mvn versions:set -DnewVersion=${version}
+            mvn --batch-mode versions:set -DnewVersion=${version}
         fi
     )
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
         if [ -d "build-tools" ]; then
             cd build-tools
-            mvn versions:set -DnewVersion=${version}
+            mvn --batch-mode versions:set -DnewVersion=${version}
         fi
     )
     (
@@ -94,10 +94,10 @@ function build_confluent () {
             replace_value_in_pom ${pom} installed.pom.file pom.xml
         done
         sed -i "s/https:\/\/packages.confluent.io\/maven\//${MAVEN_URL//\//\\\/}/" pom.xml
-        mvn versions:set -DnewVersion=${version}
-        mvn versions:update-child-modules
+        mvn --batch-mode versions:set -DnewVersion=${version}
+        mvn --batch-mode versions:update-child-modules
         git apply ${SCRIPT_DIR}/cp-common.manifest.patch
-        mvn install --update-snapshots \
+        mvn --batch-mode install --update-snapshots \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
@@ -107,7 +107,7 @@ function publish_confluent () {
     echo "Publishing Confluent ${confluent_git_refspec} to ${MAVEN_REPO_ID}"
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
-        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -DskipTests=true \
+        mvn --batch-mode deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -DskipTests=true \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }

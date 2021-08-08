@@ -81,10 +81,10 @@ function build_confluent () {
         sed -i "s/https:\/\/packages.confluent.io\/maven\//${MAVEN_URL//\//\\\/}/" pom.xml
         sed -i "s/\${confluent.maven.repo}/${MAVEN_URL//\//\\\/}/" pom.xml
         # set project version
-        mvn versions:set -DnewVersion=${version}
-        mvn versions:update-child-modules
+        mvn --batch-mode versions:set -DnewVersion=${version}
+        mvn --batch-mode versions:update-child-modules
         # install
-        mvn install --update-snapshots -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
+        mvn --batch-mode install --update-snapshots -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
@@ -94,7 +94,7 @@ function publish_confluent () {
     echo "Publishing Confluent ${confluent_git_refspec} to ${MAVEN_REPO_ID}"
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
-        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} \
+        mvn --batch-mode deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} \
             -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
