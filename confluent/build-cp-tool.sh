@@ -4,19 +4,18 @@ SCRIPT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 BUILD_DIR=${SCRIPT_DIR}/build
 source ${SCRIPT_DIR}/builds
 
-CONFLUENT_GIT_REPO=${CONFLUENT_GIT_REPO:-https://github.com/confluentinc/rest-utils.git}
-
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: MAVEN_REPO_ID=confluent-snapshots::default::\${MAVEN_URL} SHOULD_PUBLISH=true $0"
+    echo "Usage: CONFLUENT_GIT_REPO=https://github.com/confluentinc/rest-utils.git MAVEN_REPO_ID=confluent-snapshots::default::\${MAVEN_URL} SHOULD_PUBLISH=true $0"
     echo
     return 1
 }
 
 function resolve_build_dir () {
     local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
-    echo "${BUILD_DIR}/cp-rest-utils-${confluent_git_refspec//\//-}"
+    local repo_short_name=$(sed 's/^.*\/\([^.]\+\)\.git/\1/' <<<$CONFLUENT_GIT_REPO)
+    echo "${BUILD_DIR}/cp-${repo_short_name}-${confluent_git_refspec//\//-}"
 }
 
 function resolve_confluent_main_version () {
@@ -69,8 +68,12 @@ function build_confluent () {
         sed -i '0,/<version>/{s/<version>[^<]*<\/version>/<version>7.0.0-SNAPSHOT<\/version>/}' pom.xml
         mvn versions:set -DnewVersion=${version}
         mvn versions:update-child-modules
-        mvn install -Dmaven.test.skip=true \
-            -Dio.confluent.common.version=${version} -Dio.confluent.rest-utils.version=${version} \
+        mvn install -DskipTests=true \
+            -Dio.confluent.common.version=${version} \
+            -Dio.confluent.rest-utils.version=${version} \
+            -Dio.confluent.schema-registry.version=${version} \
+            -Dio.confluent.kafka-rest.version=${version} \
+            -Dio.confluent.ksql.version=${version} \
             -Dkafka.version=${kafka_version} -Dconfluent.version.range=${kafka_version} \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
@@ -83,8 +86,12 @@ function publish_confluent () {
     local kafka_version=$(resolve_confluent_kafka_version ${confluent_git_refspec})
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
-        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -Dmaven.test.skip=true \
-            -Dio.confluent.common.version=${version} -Dio.confluent.rest-utils.version=${version} \
+        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -DskipTests=true \
+            -Dio.confluent.common.version=${version} \
+            -Dio.confluent.rest-utils.version=${version} \
+            -Dio.confluent.schema-registry.version=${version} \
+            -Dio.confluent.kafka-rest.version=${version} \
+            -Dio.confluent.ksql.version=${version} \
             -Dkafka.version=${kafka_version} -Dconfluent.version.range=${kafka_version} \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
@@ -115,6 +122,10 @@ function parseCmd () {
                 ;;
         esac
     done
+    if [ -z "${CONFLUENT_GIT_REPO}" ]; then
+        usage "Missing env var CONFLUENT_GIT_REPO: $1"
+        return $?
+    fi
     if [ -z "${MAVEN_REPO_ID}" ] && [ "${SHOULD_PUBLISH}" == "true" ]; then
         usage "Missing env var MAVEN_REPO_ID: $1"
         return $?

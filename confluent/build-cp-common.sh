@@ -96,7 +96,7 @@ function publish_confluent () {
     local kafka_version=$(resolve_confluent_kafka_version ${confluent_git_refspec})
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
-        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -Dmaven.test.skip=true \
+        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -DskipTests=true \
             -Dinstalled.pom.file=pom.xml -Dio.confluent.common.version=${version} \
             -Dkafka.version=${kafka_version} -Dconfluent.version.range=${kafka_version} \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)

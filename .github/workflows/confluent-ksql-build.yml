@@ -1,4 +1,4 @@
-name: Confluent Rest Utils Build
+name: Confluent Ksql Build
 
 on:
   workflow_run:
@@ -41,6 +41,6 @@ jobs:
     - name: Build  
       run: ./confluent/build-cp-tool.sh
       env:
-        CONFLUENT_GIT_REPO: https://github.com/confluentinc/rest-utils.git
+        CONFLUENT_GIT_REPO: https://github.com/confluentinc/ksql.git
         MAVEN_REPO_ID: confluent-snapshots::default::${{ steps.gcp-maven.outputs.maven_url }}
         SHOULD_PUBLISH: ${{ secrets.SHOULD_PUBLISH }}
