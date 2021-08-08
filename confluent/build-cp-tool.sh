@@ -88,7 +88,8 @@ function publish_confluent () {
     echo "Publishing Confluent ${confluent_git_refspec} to ${MAVEN_REPO_ID}"
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
-        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -DskipTests=true \
+        mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} \
+            -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
