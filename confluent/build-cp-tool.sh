@@ -2,20 +2,13 @@
 set -e
 SCRIPT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 BUILD_DIR=${SCRIPT_DIR}/build
-source ${SCRIPT_DIR}/builds
 
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: CONFLUENT_GIT_REPO=https://github.com/confluentinc/rest-utils.git MAVEN_REPO_ID=confluent-snapshots::default::\${MAVEN_URL} SHOULD_PUBLISH=true $0"
+    echo "Usage: CONFLUENT_GIT_REPO=https://github.com/confluentinc/rest-utils.git BUILD=7.0.0 MAVEN_REPO_ID=confluent-snapshots::default::\${MAVEN_URL} SHOULD_PUBLISH=true $0"
     echo
     return 1
-}
-
-function resolve_build_dir () {
-    local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
-    local repo_short_name=$(sed 's/^.*\/\([^.]\+\)\.git/\1/' <<<$CONFLUENT_GIT_REPO)
-    echo "${BUILD_DIR}/cp-${repo_short_name}-${confluent_git_refspec//\//-}"
 }
 
 function resolve_confluent_main_version () {
@@ -32,9 +25,17 @@ function resolve_confluent_version () {
     echo "$(resolve_confluent_main_version ${confluent_git_refspec})-SNAPSHOT"
 }
 
-function resolve_confluent_kafka_version () {
+function replace_value_in_pom () {
+    local file=${1:?"Missing file as first parameter!"}
+    local attribute=${2:?"Missing attribute as second parameter!"}
+    local new_value=${3:?"Missing new value as third parameter!"}
+    sed -i "s/<${attribute}>[^<]*<\/${attribute}>/<${attribute}>${new_value}<\/${attribute}>/" ${file}
+}
+
+function resolve_build_dir () {
     local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
-    echo "$(resolve_confluent_main_version ${confluent_git_refspec})-ccs-SNAPSHOT"
+    local repo_short_name=$(sed 's/^.*\/\([^.]\+\)\.git/\1/' <<<$CONFLUENT_GIT_REPO)
+    echo "${BUILD_DIR}/cp-${repo_short_name}-${confluent_git_refspec//\//-}"
 }
 
 function cleanup_confluent_build () {
@@ -62,19 +63,22 @@ function build_confluent () {
     local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
     echo "Building Confluent ${confluent_git_refspec}"
     local version=$(resolve_confluent_version ${confluent_git_refspec})
-    local kafka_version=$(resolve_confluent_kafka_version ${confluent_git_refspec})
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
-        sed -i '0,/<version>/{s/<version>[^<]*<\/version>/<version>7.0.0-SNAPSHOT<\/version>/}' pom.xml
+        # replace parent version
+        sed -i "0,/<version>/{s/<version>[^<]*<\/version>/<version>${version}<\/version>/}" pom.xml
+        # replace tool versions
+        for pom in $(find . -name pom.xml); do
+            replace_value_in_pom ${pom} io.confluent.rest-utils.version ${version}
+            replace_value_in_pom ${pom} io.confluent.schema-registry.version ${version}
+            replace_value_in_pom ${pom} io.confluent.kafka-rest.version ${version}
+            replace_value_in_pom ${pom} io.confluent.ksql.version ${version}
+        done
+        # set project version
         mvn versions:set -DnewVersion=${version}
         mvn versions:update-child-modules
-        mvn install -DskipTests=true \
-            -Dio.confluent.common.version=${version} \
-            -Dio.confluent.rest-utils.version=${version} \
-            -Dio.confluent.schema-registry.version=${version} \
-            -Dio.confluent.kafka-rest.version=${version} \
-            -Dio.confluent.ksql.version=${version} \
-            -Dkafka.version=${kafka_version} -Dconfluent.version.range=${kafka_version} \
+        # install
+        mvn install -DskipTests=true -Dspotbugs.skip=true -Dcheckstyle.skip=true \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
@@ -82,17 +86,9 @@ function build_confluent () {
 function publish_confluent () {
     local confluent_git_refspec=${1:?"Missing Confluent Git refspec as first parameter!"}
     echo "Publishing Confluent ${confluent_git_refspec} to ${MAVEN_REPO_ID}"
-    local version=$(resolve_confluent_version ${confluent_git_refspec})
-    local kafka_version=$(resolve_confluent_kafka_version ${confluent_git_refspec})
     (
         cd "$(resolve_build_dir ${confluent_git_refspec})"
         mvn deploy -DaltDeploymentRepository=${MAVEN_REPO_ID} -DskipTests=true \
-            -Dio.confluent.common.version=${version} \
-            -Dio.confluent.rest-utils.version=${version} \
-            -Dio.confluent.schema-registry.version=${version} \
-            -Dio.confluent.kafka-rest.version=${version} \
-            -Dio.confluent.ksql.version=${version} \
-            -Dkafka.version=${kafka_version} -Dconfluent.version.range=${kafka_version} \
             -DgitRepo=${CONFLUENT_GIT_REPO} -DgitRef=${confluent_git_refspec} -DbuildTimestamp=$(date -Iseconds --utc)
     )
 }
@@ -126,6 +122,11 @@ function parseCmd () {
         usage "Missing env var CONFLUENT_GIT_REPO: $1"
         return $?
     fi
+    if [ -z "${BUILD}" ]; then
+        usage "Missing env var BUILD: $1"
+        return $?
+    fi
+    BUILDS=(${BUILD})
     if [ -z "${MAVEN_REPO_ID}" ] && [ "${SHOULD_PUBLISH}" == "true" ]; then
         usage "Missing env var MAVEN_REPO_ID: $1"
         return $?

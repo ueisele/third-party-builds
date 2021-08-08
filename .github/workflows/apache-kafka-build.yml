@@ -1,4 +1,4 @@
-name: Confluent Kafka Build
+name: Apache Kafka Build
 
 on:
   schedule:
@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        build: ["7.0.0", "7.1.0"]
+        build: ["3.0", "trunk"]
       fail-fast: false
 
     runs-on: ubuntu-20.04
@@ -32,8 +32,8 @@ jobs:
     - name: Get Maven Url and Credentials
       id: gcp-maven
       run: |
-        echo "::set-output name=maven_url::$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO_CONFLUENT }} --location ${{ secrets.GCP_LOCATION }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)"
-        maven_password="$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO_CONFLUENT }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')"
+        echo "::set-output name=maven_url::$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO_APACHE_KAFKA }} --location ${{ secrets.GCP_LOCATION }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)"
+        maven_password="$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --repository ${{ secrets.GCP_ARTIFACT_REPO_APACHE_KAFKA }} --location ${{ secrets.GCP_LOCATION }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')"
         echo "::set-output name=maven_password::${maven_password}"
         echo "::add-mask::${maven_password}"
 
@@ -48,7 +48,7 @@ jobs:
         key: ${{ env.cache-name }}
 
     - name: Build and Publish ${{ matrix.build }}
-      run: ./confluent/build-cp-kafka.sh
+      run: ./apache/build.sh
       env:
         BUILD: ${{ matrix.build }}
         MAVEN_URL: ${{ steps.gcp-maven.outputs.maven_url }}

@@ -8,7 +8,7 @@ IMAGE_NAME="openjdk${ZULU_OPENJDK_RELEASE}-jdk:${ZULU_OPENJDK_VERSION}-zulu-ubi$
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: MAVEN_USERNAME=user MAVEN_PASSWORD=password SHOULD_PUBLISH=true $0"
+    echo "Usage: BUILD=3.0 $0 apache/build.sh"
     echo
     return 1
 }
@@ -26,6 +26,9 @@ function build_image () {
 function run_in_image () {
     docker run --rm \
         -v "${SCRIPT_DIR}/..:/home/appuser/workspace" \
+        --env CONFLUENT_GIT_REPO=${CONFLUENT_GIT_REPO} \
+        --env BUILD=${BUILD} \
+        --env MAVEN_REPO_ID=${MAVEN_REPO_ID} \
         --env MAVEN_URL=${MAVEN_URL} \
         --env MAVEN_USERNAME=${MAVEN_USERNAME} \
         --env MAVEN_PASSWORD=${MAVEN_PASSWORD} \
@@ -33,38 +36,9 @@ function run_in_image () {
         ${IMAGE_NAME} workspace/$@
 }
 
-function parseCmd () {
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            --publish)
-                SHOULD_PUBLISH=true
-                shift
-                ;;
-            *)
-                usage "Unknown option: $1"
-                return $?
-                ;;
-        esac
-    done
-    if [ -z "${MAVEN_USERNAME}" ] && [ "${SHOULD_PUBLISH}" == "true" ]; then
-        usage "Missing env var MAVEN_USERNAME: $1"
-        return $?
-    fi
-    if [ -z "${MAVEN_PASSWORD}" ] && [ "${SHOULD_PUBLISH}" == "true" ]; then
-        usage "Missing env var MAVEN_PASSWORD: $1"
-        return $?
-    fi
-    return 0
-}
 function main () {
-    parseCmd "$@"
-    local retval=$?
-    if [ $retval != 0 ]; then
-        exit $retval
-    fi
-
     build_image
-    run_in_image build.sh
+    run_in_image "$@"
 }
 
 main "$@"

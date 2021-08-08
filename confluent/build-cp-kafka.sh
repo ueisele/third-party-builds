@@ -2,14 +2,13 @@
 set -e
 SCRIPT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 BUILD_DIR=${SCRIPT_DIR}/build
-source ${SCRIPT_DIR}/builds
 
 KAFKA_GIT_REPO=${KAFKA_GIT_REPO:-https://github.com/confluentinc/kafka.git}
 
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: MAVEN_URL=https://... MAVEN_USERNAME=user MAVEN_PASSWORD=password SHOULD_PUBLISH=true $0"
+    echo "Usage: BUILD=7.0.0 MAVEN_URL=https://... MAVEN_USERNAME=user MAVEN_PASSWORD=password SHOULD_PUBLISH=true $0"
     echo
     return 1
 }
@@ -101,6 +100,11 @@ function parseCmd () {
                 ;;
         esac
     done
+    if [ -z "${BUILD}" ]; then
+        usage "Missing env var BUILD: $1"
+        return $?
+    fi
+    BUILDS=(${BUILD})
     if [ -z "${MAVEN_URL}" ] && [ "${SHOULD_PUBLISH}" == "true" ]; then
         usage "Missing env var MAVEN_URL: $1"
         return $?

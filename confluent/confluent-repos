@@ -1,7 +1,0 @@
-REPOS=(
-    "https://github.com/confluentinc/common.git" 
-    "https://github.com/confluentinc/rest-utils.git"
-    "https://github.com/confluentinc/schema-registry.git"
-    "https://github.com/confluentinc/kafka-rest.git"
-    "https://github.com/confluentinc/ksql.git"
-)
