@@ -1,10 +1,8 @@
 name: Confluent Ksql Build
 
 on:
-  workflow_run:
-    workflows: ["Confluent Schema Registry Build"]
-    types:
-      - completed
+  schedule:
+  - cron:  '0 5 * * 2-6'
   workflow_dispatch:
 
 jobs:
