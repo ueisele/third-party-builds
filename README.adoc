@@ -11,14 +11,14 @@ The following repositories are considered:
  * link:https://github.com/confluentinc/kafka-rest.git[]
  * link:https://github.com/confluentinc/ksql.git[]
 
-At the moment versions for Apache Kafka _3.0_ and _3.1_ and Confluent _7.0_ and _7.1_ are build and published.
+At the moment versions for Apache Kafka _3.1_ and Confluent _7.0_ and _7.1_ are build and published.
 
 The artifacts have `-SNAPSHOT` as version suffix.
 
-.To install a Snapshot version of Apache's Kafka Streams 3.0.0 with Gradle
+.To install a Snapshot version of Apache's Kafka Streams 3.1.0 with Gradle
 [source,groovy]
 ----
-compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.0.0-SNAPSHOT'
+compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.1.0-SNAPSHOT'
 ----
 
 .To install a Snapshot version of Confluent's Kafka Streams 7.0.0 with Gradle
