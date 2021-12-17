@@ -2,7 +2,7 @@ name: Confluent Kafka Rest Build
 
 on:
   schedule:
-  - cron:  '0 5 * * 2-6'
+  - cron:  '0 5 * * 3,6'
   workflow_dispatch:
 
 jobs:

@@ -1,6 +1,6 @@
 = Kafka Builds
 
-This repository is used to build and publish _SNAPSHOT_ and _RC_ versions of link:https://github.com/apache/kafka.git[Apache Kafka], link:https://github.com/confluentinc/kafka.git[Confluent Kafka] and related tools every day from Tuesday to Saturday.
+This repository is used to build and publish _SNAPSHOT_ and _RC_ versions of link:https://github.com/apache/kafka.git[Apache Kafka], link:https://github.com/confluentinc/kafka.git[Confluent Kafka] and related tools Wednesday and Saturday.
 The following repositories are considered: 
  
  * link:https://github.com/apache/kafka.git[]
