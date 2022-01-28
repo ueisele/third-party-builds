@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        build: ["3.1", "trunk"]
+        build: ["trunk"]
       fail-fast: false
 
     runs-on: ubuntu-20.04

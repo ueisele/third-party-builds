@@ -9,7 +9,7 @@ MAVEN_URL=${MAVEN_URL:-https://packages.confluent.io/maven/}
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: BUILD=7.0.0 MAVEN_REPO_ID=confluent-snapshots::default::\${MAVEN_URL} SHOULD_PUBLISH=true $0"
+    echo "Usage: BUILD=7.2.0 MAVEN_REPO_ID=confluent-snapshots::default::\${MAVEN_URL} SHOULD_PUBLISH=true $0"
     echo
     return 1
 }
