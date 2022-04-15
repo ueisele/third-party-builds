@@ -11,26 +11,26 @@ The following repositories are considered:
  * link:https://github.com/confluentinc/kafka-rest.git[]
  * link:https://github.com/confluentinc/ksql.git[]
 
-At the moment versions for Apache Kafka _3.2_, Confluent _7.1_ and _7.2_ are build and published.
+At the moment versions for Apache Kafka _3.2_ and _3.3_ and Confluent _7.2_ are build and published.
 
 The artifacts have `-SNAPSHOT` as version suffix.
 
-.To install a Snapshot version of Apache's Kafka Streams 3.2.0 with Gradle
+.To install a Snapshot version of Apache's Kafka Streams 3.3.0 with Gradle
 [source,groovy]
 ----
-compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.2.0-SNAPSHOT'
+compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.3.0-SNAPSHOT'
 ----
 
 .To install a Snapshot version of Confluent's Kafka Streams 7.1.0 with Gradle
 [source,groovy]
 ----
-compile group: 'org.apache.kafka', name: 'kafka-streams', version: '7.1.0-ccs-SNAPSHOT'
+compile group: 'org.apache.kafka', name: 'kafka-streams', version: '7.2.0-ccs-SNAPSHOT'
 ----
 
-.To install a Snapshot version of Confluent's Kafka Avro Serializer 7.1.0 with Gradle
+.To install a Snapshot version of Confluent's Kafka Avro Serializer 7.2.0 with Gradle
 [source,groovy]
 ----
-compile group: 'io.confluent', name: 'kafka-avro-serializer', version: '7.1.0-SNAPSHOT'
+compile group: 'io.confluent', name: 'kafka-avro-serializer', version: '7.2.0-SNAPSHOT'
 ----
 
 The artifacts are published to a _Google Arifact Repository_ and can be fetched via https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/kafka-snapshots for Apache Kafka and https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/confluent-snapshots for Confluent.

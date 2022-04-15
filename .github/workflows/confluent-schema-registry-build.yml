@@ -11,7 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        build: ["7.1.0","7.2.0"]
+        build: ["7.2.0"]
       fail-fast: false
 
     runs-on: ubuntu-20.04
@@ -22,10 +22,10 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: 'zulu'
-        java-version: '11'
+        java-version: '17'
 
     - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@v0
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
