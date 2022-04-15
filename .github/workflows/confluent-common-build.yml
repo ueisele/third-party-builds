@@ -11,7 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        build: ["7.2.0", "master"]
+        build: ["7.2.0", "7.3.0"]
       fail-fast: false
 
     runs-on: ubuntu-20.04
