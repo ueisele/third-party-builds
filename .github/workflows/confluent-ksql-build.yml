@@ -2,7 +2,7 @@ name: Confluent Ksql Build
 
 on:
   workflow_run:
-    workflows: ["Confluent Common Build"]
+    workflows: ["Confluent Schema Registry Build"]
     types:
       - completed
   workflow_dispatch:
