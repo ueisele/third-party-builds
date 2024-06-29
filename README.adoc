@@ -70,6 +70,32 @@ compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.7.1'
 compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.8.0-SNAPSHOT'
 ----
 
+=== Confluent
+
+This repository is used to build and publish _RELEASE_, _RC_ and _SNAPSHOT_ versions of link:https://github.com/confluentinc/kafka.git[Confluent Kafka] and related tools Wednesday and Saturday.
+The following repositories are considered: 
+
+ * link:https://github.com/confluentinc/kafka.git[]
+ * link:https://github.com/confluentinc/common.git[]
+ * link:https://github.com/confluentinc/rest-utils.git[]
+ * link:https://github.com/confluentinc/schema-registry.git[]
+ * link:https://github.com/confluentinc/kafka-rest.git[]
+ * link:https://github.com/confluentinc/ksql.git[]
+
+At the moment versions for AConfluent _7.6.2_ and _7.7.0-SNAPSHOT_ and _7.8.0-SNAPSHOT_ are build and published.
+
+.To install a Snapshot version of Confluent's Kafka Streams 7.7.0 with Gradle
+[source,groovy]
+----
+compile group: 'org.apache.kafka', name: 'kafka-streams', version: '7.7.0-ccs-SNAPSHOT'
+----
+
+.To install a Snapshot version of Confluent's Kafka Avro Serializer 7.7.0 with Gradle
+[source,groovy]
+----
+compile group: 'io.confluent', name: 'kafka-avro-serializer', version: '7.7.0-SNAPSHOT'
+----
+
 == Development
 
 .Print Gradle settings
