@@ -8,7 +8,7 @@ KAFKA_GIT_REPO=${KAFKA_GIT_REPO:-https://github.com/apache/kafka.git}
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: BUILD=3.2 MAVEN_URL=https://... MAVEN_USERNAME=user MAVEN_PASSWORD=password SHOULD_PUBLISH=true $0"
+    echo "Usage: BUILD=3.7.1 MAVEN_URL=https://... MAVEN_USERNAME=user MAVEN_PASSWORD=password SHOULD_PUBLISH=true $0"
     echo
     return 1
 }
@@ -21,10 +21,10 @@ function resolve_build_dir () {
 function resolveKafkaVersion () {
     local kafka_git_refspec=${1:?"Missing Kafka Git refspec as first parameter!"}
     (
-        cd "$(resolve_build_dir ${kafka_git_refspec})"
+        cd "$(resolve_build_dir "${kafka_git_refspec}")"
         local gradle_version=$(cat gradle.properties | sed -n 's/^version=\(.\+\)$/\1/p')
         if [[ ${gradle_version} == *-SNAPSHOT ]]; then
-            echo ${gradle_version}
+            echo "${gradle_version}"
         else
             git fetch origin
             git describe --abbrev=7
@@ -60,8 +60,8 @@ function build_kafka () {
         cd "$(resolve_build_dir ${kafka_git_refspec})"
         cat ${SCRIPT_DIR}/manifest.extension >> build.gradle
         ./gradlew jar srcJar javadocJar scaladocJar testJar testSrcJar \
-            -Pversion=$(resolveKafkaVersion ${kafka_git_refspec}) \
-            -PgitRepo=${KAFKA_GIT_REPO} -PgitCommitSha=$(git rev-parse HEAD) -PbuildTimestamp=$(date -Iseconds --utc) \
+            -Pversion="$(resolveKafkaVersion ${kafka_git_refspec})" \
+            -PgitRepo="${KAFKA_GIT_REPO}" -PgitCommitSha="$(git rev-parse HEAD)" -PbuildTimestamp="$(date -Iseconds --utc)" \
             --profile --no-daemon
     )
 }
@@ -72,21 +72,21 @@ function publish_kafka () {
     (
         cd "$(resolve_build_dir ${kafka_git_refspec})"
         ./gradlew publish \
-            -Pversion=$(resolveKafkaVersion ${kafka_git_refspec}) \
-            -PgitRepo=${KAFKA_GIT_REPO} -PgitCommitSha=$(git rev-parse HEAD) -PbuildTimestamp=$(date -Iseconds --utc) \
-            -PskipSigning=true -PmavenUrl=${MAVEN_URL} -PmavenUsername=${MAVEN_USERNAME} -PmavenPassword=${MAVEN_PASSWORD} \
+            -Pversion="$(resolveKafkaVersion ${kafka_git_refspec})" \
+            -PgitRepo="${KAFKA_GIT_REPO}" -PgitCommitSha="$(git rev-parse HEAD)" -PbuildTimestamp="$(date -Iseconds --utc)" \
+            -PskipSigning=true -PmavenUrl="${MAVEN_URL}" -PmavenUsername="${MAVEN_USERNAME}" -PmavenPassword="${MAVEN_PASSWORD}" \
             --profile --no-daemon
     )
 }
 
 function build_and_publish () {
     for build in "${BUILDS[@]}"; do
-        local kafka_git_refspec=$(git ls-remote ${KAFKA_GIT_REPO} ${build} | awk '{ print $1}')
-        cleanup_kafka_build ${kafka_git_refspec}
-        clone_kafka ${kafka_git_refspec}
-        build_kafka ${kafka_git_refspec}
+        local kafka_git_refspec="$(git ls-remote "${KAFKA_GIT_REPO}" "${build}" | awk '{ print $1}')"
+        cleanup_kafka_build "${kafka_git_refspec}"
+        clone_kafka "${kafka_git_refspec}"
+        build_kafka "${kafka_git_refspec}"
         if [ "${SHOULD_PUBLISH}" == "true" ]; then
-            publish_kafka ${kafka_git_refspec}
+            publish_kafka "${kafka_git_refspec}"
         fi
     done
 }

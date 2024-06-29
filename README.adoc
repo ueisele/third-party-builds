@@ -1,53 +1,23 @@
-= Kafka Builds
+= 3rd-Party Builds
 
-This repository is used to build and publish _SNAPSHOT_ and _RC_ versions of link:https://github.com/apache/kafka.git[Apache Kafka], link:https://github.com/confluentinc/kafka.git[Confluent Kafka] and related tools Wednesday and Saturday.
-The following repositories are considered: 
- 
- * link:https://github.com/apache/kafka.git[]
- * link:https://github.com/confluentinc/kafka.git[]
- * link:https://github.com/confluentinc/common.git[]
- * link:https://github.com/confluentinc/rest-utils.git[]
- * link:https://github.com/confluentinc/schema-registry.git[]
- * link:https://github.com/confluentinc/kafka-rest.git[]
- * link:https://github.com/confluentinc/ksql.git[]
+This repository is used to build and publish _RELEASE_, _RC_ and _SNAPSHOT_ versions of third-party libraries.
 
-At the moment versions for Apache Kafka _3.2_ and _3.3_ and Confluent _7.2_ are build and published.
+== Libraries
 
-The artifacts have `-SNAPSHOT` as version suffix.
-
-.To install a Snapshot version of Apache's Kafka Streams 3.3.0 with Gradle
-[source,groovy]
-----
-compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.3.0-SNAPSHOT'
-----
-
-.To install a Snapshot version of Confluent's Kafka Streams 7.1.0 with Gradle
-[source,groovy]
-----
-compile group: 'org.apache.kafka', name: 'kafka-streams', version: '7.2.0-ccs-SNAPSHOT'
-----
-
-.To install a Snapshot version of Confluent's Kafka Avro Serializer 7.2.0 with Gradle
-[source,groovy]
-----
-compile group: 'io.confluent', name: 'kafka-avro-serializer', version: '7.2.0-SNAPSHOT'
-----
-
-The artifacts are published to a _Google Arifact Repository_ and can be fetched via https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/kafka-snapshots for Apache Kafka and https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/confluent-snapshots for Confluent.
-
+The artifacts are published to a _Google Arifact Repository_ and can be fetched via https://europe-north1-maven.pkg.dev/gcp-uweeisele-dev/third-party-maven-releases and https://europe-north1-maven.pkg.dev/gcp-uweeisele-dev/third-party-maven-snapshots.
 
 .Add the following snippet to your `gradle.build` file
 [source,java]
 ----
 repositories {
     maven {
-        url 'https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/kafka-snapshots'
+        url 'https://europe-north1-maven.pkg.dev/gcp-uweeisele-dev/third-party-maven-releases'
         mavenContent {
-            snapshotsOnly()
+            releasesOnly()
         }
     }
     maven {
-        url 'https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/confluent-snapshots'
+        url 'https://europe-north1-maven.pkg.dev/gcp-uweeisele-dev/third-party-maven-snapshots'
         mavenContent {
             snapshotsOnly()
         }
@@ -55,23 +25,23 @@ repositories {
 }
 ----
 
-.Add the following snippet to yout `pom.xml` file
+.Add the following snippet to your `pom.xml` file
 [source,xml]
 ----
 <repositories>
   <repository>
-    <id>kafka-snapshots</id>
-    <url>https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/kafka-snapshots</url>
+    <id>third-party-releases</id>
+    <url>https://europe-north1-maven.pkg.dev/gcp-uweeisele-dev/third-party-maven-releases</url>
     <releases>
-      <enabled>false</enabled>
+      <enabled>true</enabled>
     </releases>
     <snapshots>
-      <enabled>true</enabled>
+      <enabled>false</enabled>
     </snapshots>
   </repository>
   <repository>
-    <id>confluent-snapshots</id>
-    <url>https://europe-west3-maven.pkg.dev/gcp-uweeisele-dev/confluent-snapshots</url>
+    <id>third-party-snapshots</id>
+    <url>https://europe-north1-maven.pkg.dev/gcp-uweeisele-dev/third-party-maven-snapshots</url>
     <releases>
       <enabled>false</enabled>
     </releases>
@@ -80,4 +50,48 @@ repositories {
     </snapshots>
   </repository>
 </repositories>
+----
+
+=== Apache Kafka
+
+This repository is used to build and publish _RELEASE_, _RC_ and _SNAPSHOT_ versions of link:https://github.com/apache/kafka.git[Apache Kafka] Wednesday and Saturday.
+
+At the moment versions for Apache Kafka _3.7.1_ and _3.8-SNAPSHOT_ and _3.9-SNAPSHOT_ are build and published.
+
+.To install a Release version of Apache's Kafka Streams 3.7.1 with Gradle
+[source,groovy]
+----
+compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.7.1'
+----
+
+.To install a Snapshot version of Apache's Kafka Streams 3.8.0 with Gradle
+[source,groovy]
+----
+compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.8.0-SNAPSHOT'
+----
+
+== Development
+
+.Print Gradle settings
+[source,bash]
+----
+gcloud artifacts print-settings gradle --project gcp-uweeisele-dev --location europe-north1 --repository third-party-maven-releases
+----
+
+.Print Maven settings
+[source,bash]
+----
+gcloud artifacts print-settings mvn --project gcp-uweeisele-dev --location europe-north1 --repository third-party-maven-releases
+----
+
+.Build locally
+[source,bash]
+----
+BUILD=3.7.1 apache/kafka/build.sh
+----
+
+.Build locally in Docker
+[source,bash]
+----
+BUILD=3.7.1 docker/run_in_docker.sh apache/kafka/build.sh
 ----

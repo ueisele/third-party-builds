@@ -1,0 +1,57 @@
+name: Apache Kafka Release Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        build: ["3.7.1"]
+      fail-fast: false
+
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    - name: Get Maven Url and Credentials
+      id: gcp-maven
+      run: |
+        echo "::set-output name=maven_url::$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --location ${{ secrets.GCP_LOCATION }} --repository ${{ secrets.GCP_ARTIFACT_REPO_RELEASES }} | grep url | sed 's/.*"\([^"]\+\)"/\1/' | uniq)"
+        maven_password="$(gcloud artifacts print-settings gradle --project ${{ secrets.GCP_PROJECT_ID }} --location ${{ secrets.GCP_LOCATION }} --repository ${{ secrets.GCP_ARTIFACT_REPO_RELEASES }} | grep "def artifactRegistryMavenSecret" | sed 's/.*"\([^"]\+\)"/\1/')"
+        echo "::set-output name=maven_password::${maven_password}"
+        echo "::add-mask::${maven_password}"
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: gradle-apache-kafka-${{ matrix.build }}
+
+    - name: Build and Publish
+      run: ./apache/kafka/build.sh
+      env:
+        BUILD: ${{ matrix.build }}
+        MAVEN_URL: ${{ steps.gcp-maven.outputs.maven_url }}
+        MAVEN_USERNAME: _json_key_base64
+        MAVEN_PASSWORD: ${{ steps.gcp-maven.outputs.maven_password }}
+        SHOULD_PUBLISH: ${{ secrets.SHOULD_PUBLISH }}
