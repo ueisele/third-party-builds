@@ -1,8 +1,6 @@
 name: Apache Kafka Snapshot Build
 
 on:
-  schedule:
-  - cron:  '0 4 * * 3,6'
   workflow_dispatch:
 
 jobs:
