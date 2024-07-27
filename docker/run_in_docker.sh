@@ -8,7 +8,7 @@ IMAGE_NAME="openjdk${ZULU_OPENJDK_RELEASE}-jdk:${ZULU_OPENJDK_VERSION}-zulu-ubi$
 function usage () {
     echo "$0: $1" >&2
     echo
-    echo "Usage: BUILD=3.7.1 $0 apache/build.sh"
+    echo "Usage: BUILD=3.8.0 $0 apache/build.sh"
     echo
     return 1
 }

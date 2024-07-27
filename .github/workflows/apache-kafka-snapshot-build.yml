@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        build: ["3.8", "trunk"]
+        build: ["trunk"]
       fail-fast: false
 
     runs-on: ubuntu-24.04

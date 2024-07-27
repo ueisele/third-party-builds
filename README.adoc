@@ -56,18 +56,18 @@ repositories {
 
 This repository is used to build and publish _RELEASE_, _RC_ and _SNAPSHOT_ versions of link:https://github.com/apache/kafka.git[Apache Kafka] Wednesday and Saturday.
 
-At the moment versions for Apache Kafka _3.7.1_ and _3.8-SNAPSHOT_ and _3.9-SNAPSHOT_ are build and published.
+At the moment versions for Apache Kafka _3.8.0_ and _3.9-SNAPSHOT_ are build and published.
 
-.To install a Release version of Apache's Kafka Streams 3.7.1 with Gradle
+.To install a Release version of Apache's Kafka Streams 3.8.0 with Gradle
 [source,groovy]
 ----
-compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.7.1'
+compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.8.0'
 ----
 
-.To install a Snapshot version of Apache's Kafka Streams 3.8.0 with Gradle
+.To install a Snapshot version of Apache's Kafka Streams 3.9.0 with Gradle
 [source,groovy]
 ----
-compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.8.0-SNAPSHOT'
+compile group: 'org.apache.kafka', name: 'kafka-streams', version: '3.9.0-SNAPSHOT'
 ----
 
 == Development
@@ -87,11 +87,11 @@ gcloud artifacts print-settings mvn --project gcp-uweeisele-dev --location europ
 .Build locally
 [source,bash]
 ----
-BUILD=3.7.1 apache/kafka/build.sh
+BUILD=3.8.0 apache/kafka/build.sh
 ----
 
 .Build locally in Docker
 [source,bash]
 ----
-BUILD=3.7.1 docker/run_in_docker.sh apache/kafka/build.sh
+BUILD=3.8.0 docker/run_in_docker.sh apache/kafka/build.sh
 ----
