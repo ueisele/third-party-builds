@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        build: ["trunk"]
+        build: ["feat/versioned-record-serializer"]
       fail-fast: false
 
     runs-on: ubuntu-24.04
@@ -50,6 +50,7 @@ jobs:
     - name: Build and Publish
       run: ./apache/kafka/build.sh
       env:
+        KAFKA_GIT_REPO: https://github.com/ueisele/kafka.git
         BUILD: ${{ matrix.build }}
         MAVEN_URL: ${{ steps.gcp-maven.outputs.maven_url }}
         MAVEN_USERNAME: _json_key_base64
